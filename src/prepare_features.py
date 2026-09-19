@@ -23,6 +23,11 @@ df = pd.read_csv(
     INPUT_FILE,
     low_memory=False
 )
+# Keep original cleaned-dataset row ID
+# so predictions can later be traced back
+# to the original email.
+df["source_row_id"] = df.index
+
 
 print("\n======================================")
 print("FEATURE SELECTION")
@@ -140,6 +145,8 @@ if missing_features:
 # ==========================================
 
 ml_df = df[
+    ["source_row_id"]
+    +
     selected_features
     +
     ["label"]
