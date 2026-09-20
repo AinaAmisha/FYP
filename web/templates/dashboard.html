@@ -1,0 +1,446 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Dashboard | Email Security
+{% endblock %}
+
+
+{% block content %}
+
+
+<header class="page-header">
+
+    <div>
+
+        <h1>Dashboard</h1>
+
+        <p>
+            Machine Learning-Based False Detection
+            in Email Log Classification
+        </p>
+
+    </div>
+
+
+    <div class="system-badge">
+
+        <span class="status-dot"></span>
+
+        ML Engine Active
+
+    </div>
+
+</header>
+
+
+
+<section class="metric-grid">
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Emails Tested
+        </div>
+
+        <div class="metric-value">
+            {{ "{:,}".format(data.total_test) }}
+        </div>
+
+        <div class="metric-description">
+            Held-out testing dataset
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Selected Model
+        </div>
+
+        <div class="metric-value model-name">
+            {{ data.best_model }}
+        </div>
+
+        <div class="metric-description">
+            Highest F1 performance
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Accuracy
+        </div>
+
+        <div class="metric-value">
+            {{ "%.2f"|format(data.accuracy) }}%
+        </div>
+
+        <div class="metric-description">
+            Overall classification accuracy
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            F1 Score
+        </div>
+
+        <div class="metric-value">
+            {{ "%.2f"|format(data.f1_score) }}%
+        </div>
+
+        <div class="metric-description">
+            Precision-recall balance
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card warning-card">
+
+        <div class="metric-label">
+            False Positives
+        </div>
+
+        <div class="metric-value warning-text">
+            {{ "{:,}".format(data.false_positive) }}
+        </div>
+
+        <div class="metric-description">
+            Legitimate emails classified as spam
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card danger-card">
+
+        <div class="metric-label">
+            False Negatives
+        </div>
+
+        <div class="metric-value danger-text">
+            {{ "{:,}".format(data.false_negative) }}
+        </div>
+
+        <div class="metric-description">
+            Spam classified as legitimate
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<section class="dashboard-grid">
+
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h3>
+                    Classification Performance
+                </h3>
+
+                <p>
+                    Performance of the selected
+                    machine-learning model.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="performance-row">
+
+            <span>Precision</span>
+
+            <strong>
+                {{ "%.2f"|format(data.precision) }}%
+            </strong>
+
+        </div>
+
+
+        <div class="progress">
+
+              <div class="progress-bar"
+                  data-progress="{{ data.precision }}">
+            </div>
+
+        </div>
+
+
+
+        <div class="performance-row">
+
+            <span>Recall</span>
+
+            <strong>
+                {{ "%.2f"|format(data.recall) }}%
+            </strong>
+
+        </div>
+
+
+        <div class="progress">
+
+              <div class="progress-bar"
+                  data-progress="{{ data.recall }}">
+            </div>
+
+        </div>
+
+
+
+        <div class="performance-row">
+
+            <span>F1 Score</span>
+
+            <strong>
+                {{ "%.2f"|format(data.f1_score) }}%
+            </strong>
+
+        </div>
+
+
+        <div class="progress">
+
+              <div class="progress-bar"
+                  data-progress="{{ data.f1_score }}">
+            </div>
+
+        </div>
+
+    </div>
+
+
+
+    <div class="panel">
+
+        <div class="panel-header">
+
+            <div>
+
+                <h3>
+                    False Detection Monitor
+                </h3>
+
+                <p>
+                    Current error distribution
+                    from model testing.
+                </p>
+
+            </div>
+
+        </div>
+
+
+        <div class="false-stat">
+
+            <div>
+
+                <span>
+                    False Positive Rate
+                </span>
+
+                <p>
+                    Legitimate → Spam
+                </p>
+
+            </div>
+
+            <strong class="warning-text">
+                {{ "%.2f"|format(data.fpr) }}%
+            </strong>
+
+        </div>
+
+
+        <div class="false-stat">
+
+            <div>
+
+                <span>
+                    False Negative Rate
+                </span>
+
+                <p>
+                    Spam → Legitimate
+                </p>
+
+            </div>
+
+            <strong class="danger-text">
+                {{ "%.2f"|format(data.fnr) }}%
+            </strong>
+
+        </div>
+
+
+        <div class="false-stat">
+
+            <div>
+
+                <span>
+                    Overall False Detection
+                </span>
+
+                <p>
+                    FP + FN
+                </p>
+
+            </div>
+
+            <strong>
+                {{ "%.2f"|format(
+                data.false_detection_rate
+                ) }}%
+            </strong>
+
+        </div>
+
+    </div>
+
+</section>
+
+
+
+<section class="panel result-panel">
+
+    <div class="panel-header">
+
+        <div>
+
+            <h3>
+                Classification Result Summary
+            </h3>
+
+            <p>
+                Confusion matrix counts from
+                the current test dataset.
+            </p>
+
+        </div>
+
+    </div>
+
+
+    <div class="result-grid">
+
+
+        <div class="result-item">
+
+            <span>
+                True Negative
+            </span>
+
+            <strong>
+                {{ "{:,}".format(
+                data.true_negative
+                ) }}
+            </strong>
+
+            <small>
+                Legitimate correctly detected
+            </small>
+
+        </div>
+
+
+
+        <div class="result-item">
+
+            <span>
+                True Positive
+            </span>
+
+            <strong>
+                {{ "{:,}".format(
+                data.true_positive
+                ) }}
+            </strong>
+
+            <small>
+                Spam correctly detected
+            </small>
+
+        </div>
+
+
+
+        <div class="result-item">
+
+            <span>
+                False Positive
+            </span>
+
+            <strong class="warning-text">
+                {{ "{:,}".format(
+                data.false_positive
+                ) }}
+            </strong>
+
+            <small>
+                Requires FP investigation
+            </small>
+
+        </div>
+
+
+
+        <div class="result-item">
+
+            <span>
+                False Negative
+            </span>
+
+            <strong class="danger-text">
+                {{ "{:,}".format(
+                data.false_negative
+                ) }}
+            </strong>
+
+            <small>
+                Missed spam detections
+            </small>
+
+        </div>
+
+
+    </div>
+
+</section>
+
+<script>
+    document.querySelectorAll("[data-progress]").forEach((bar) => {
+        const value = Number.parseFloat(bar.dataset.progress);
+        const percentage = Number.isFinite(value)
+            ? Math.min(Math.max(value, 0), 100)
+            : 0;
+        bar.style.width = `${percentage}%`;
+    });
+</script>
+
+
+{% endblock %}
