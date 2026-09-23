@@ -1,0 +1,158 @@
+
+{% extends "base.html" %}
+
+{% block title %}
+Message Analysis | Email Security
+{% endblock %}
+
+{% block content %}
+
+<header class="page-header">
+    <div>
+        <h1>Message Analysis</h1>
+        <p>
+            Upload email logs for machine-learning
+            classification.
+        </p>
+    </div>
+</header>
+
+<section class="panel upload-panel">
+
+    <div class="panel-header">
+        <h3>Upload Email Logs</h3>
+        <p>Supported format: CSV</p>
+    </div>
+
+    <form method="POST"
+          enctype="multipart/form-data">
+
+        <input type="file"
+               name="file"
+               accept=".csv"
+               required>
+
+        <button type="submit"
+                class="upload-button">
+            Classify Emails
+        </button>
+
+    </form>
+
+    {% if error %}
+        <p class="upload-error">{{ error }}</p>
+    {% endif %}
+
+</section>
+
+{% if total > 0 %}
+
+<section class="metric-grid">
+
+    <div class="metric-card">
+        <div class="metric-label">
+            Emails Classified
+        </div>
+        <div class="metric-value">
+            {{ "{:,}".format(total) }}
+        </div>
+    </div>
+
+    <div class="metric-card">
+        <div class="metric-label">
+            Legitimate
+        </div>
+        <div class="metric-value legitimate-text">
+            {{ "{:,}".format(legitimate_count) }}
+        </div>
+    </div>
+
+    <div class="metric-card warning-card">
+        <div class="metric-label">
+            Spam
+        </div>
+        <div class="metric-value warning-text">
+            {{ "{:,}".format(spam_count) }}
+        </div>
+    </div>
+
+</section>
+
+<section class="panel">
+
+    <div class="panel-header">
+        <h3>Classification Results</h3>
+        <p>Showing the first 25 emails.</p>
+    </div>
+
+    <!-- DOWNLOAD BUTTON -->
+
+    {% if export_id %}
+
+    <a href="{{ url_for(
+        'download_classification',
+        export_id=export_id
+    ) }}"
+       class="download-button">
+
+        Download Classification CSV
+
+    </a>
+
+    {% endif %}
+
+    <!-- CLASSIFICATION TABLE -->
+
+    <div class="table-wrapper">
+        <table class="audit-table">
+
+            <thead>
+                <tr>
+                    <th>Sender</th>
+                    <th>Subject</th>
+                    <th>Prediction</th>
+                    <th>Confidence</th>
+                    <th>Spam Probability</th>
+                </tr>
+            </thead>
+
+            <tbody>
+                {% for row in messages %}
+                <tr>
+                    <td>{{ row.from_address }}</td>
+                    <td>{{ row.subject }}</td>
+
+                    <td>
+                        <span class="class-badge
+                            {% if row.predicted_class == 'spam' %}
+                            spam-badge
+                            {% else %}
+                            legitimate-badge
+                            {% endif %}">
+                            {{ row.predicted_class }}
+                        </span>
+                    </td>
+
+                    <td>
+                        {{ "%.2f"|format(
+                            row.prediction_confidence
+                        ) }}%
+                    </td>
+
+                    <td>
+                        {{ "%.2f"|format(
+                            row.spam_probability
+                        ) }}%
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+
+        </table>
+    </div>
+
+</section>
+
+{% endif %}
+
+{% endblock %}

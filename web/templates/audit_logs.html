@@ -1,0 +1,271 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Message Audit Logs | Email Security
+{% endblock %}
+
+
+{% block content %}
+
+<header class="page-header">
+
+    <div>
+        <h1>Message Audit Logs</h1>
+
+        <p>
+            Review email classification results
+            and false detection records.
+        </p>
+    </div>
+
+</header>
+
+
+<div class="panel">
+
+    <form method="GET"
+          action="{{ url_for('audit_logs') }}"
+          class="audit-toolbar">
+
+        <input
+            type="text"
+            name="q"
+            value="{{ query }}"
+            placeholder="Search sender, domain or subject..."
+        >
+
+
+        <select name="result">
+
+            <option value="All"
+                {% if result_filter == "All" %}
+                selected
+                {% endif %}>
+                All Results
+            </option>
+
+            <option value="True Negative"
+                {% if result_filter == "True Negative" %}
+                selected
+                {% endif %}>
+                True Negative
+            </option>
+
+            <option value="True Positive"
+                {% if result_filter == "True Positive" %}
+                selected
+                {% endif %}>
+                True Positive
+            </option>
+
+            <option value="False Positive"
+                {% if result_filter == "False Positive" %}
+                selected
+                {% endif %}>
+                False Positive
+            </option>
+
+            <option value="False Negative"
+                {% if result_filter == "False Negative" %}
+                selected
+                {% endif %}>
+                False Negative
+            </option>
+
+        </select>
+
+
+        <button type="submit">
+            Search
+        </button>
+
+    </form>
+
+
+    <div class="audit-summary">
+
+        <strong>
+            {{ "{:,}".format(total) }}
+        </strong>
+
+        messages found
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table class="audit-table">
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Sender</th>
+                    <th>Subject</th>
+                    <th>Actual</th>
+                    <th>Prediction</th>
+                    <th>Result</th>
+                    <th>SPF</th>
+                    <th>DKIM</th>
+                    <th>DMARC</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for row in messages %}
+
+                <tr>
+
+                    <td>
+                        {{ row.source_row_id }}
+                    </td>
+
+
+                    <td>
+
+                        <div class="sender-address">
+                            {{ row.from_address }}
+                        </div>
+
+                        <small>
+                            {{ row.from_domain }}
+                        </small>
+
+                    </td>
+
+
+                    <td class="subject-cell">
+                        {{ row.subject }}
+                    </td>
+
+
+                    <td>
+                        {{ row.actual_class }}
+                    </td>
+
+
+                    <td>
+                        {{ row.predicted_class }}
+                    </td>
+
+
+                    <td>
+
+                        {% if row.result_type == "False Positive" %}
+
+                            <span class="result-badge result-warning">
+                                False Positive
+                            </span>
+
+                        {% elif row.result_type == "False Negative" %}
+
+                            <span class="result-badge result-danger">
+                                False Negative
+                            </span>
+
+                        {% else %}
+
+                            <span class="result-badge result-ok">
+                                {{ row.result_type }}
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+                        {{ row.spf_result }}
+                    </td>
+
+                    <td>
+                        {{ row.dkim_result }}
+                    </td>
+
+                    <td>
+                        {{ row.dmarc_result }}
+                       <td>
+
+    <a class="view-button"
+       href="{{ url_for(
+           'message_detail',
+           source_row_id=row.source_row_id
+       ) }}">
+        View
+    </a>
+
+</td> 
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+
+                {% if not messages %}
+
+                <tr>
+
+                    <td colspan="10"
+                        class="empty-table">
+
+                        No messages found.
+
+                    </td>
+
+                </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <div class="pagination">
+
+        {% if page > 1 %}
+
+        <a href="{{ url_for(
+            'audit_logs',
+            page=page-1,
+            q=query,
+            result=result_filter
+        ) }}">
+            ← Previous
+        </a>
+
+        {% endif %}
+
+
+        <span>
+            Page {{ page }} of {{ pages }}
+        </span>
+
+
+        {% if page < pages %}
+
+        <a href="{{ url_for(
+            'audit_logs',
+            page=page+1,
+            q=query,
+            result=result_filter
+        ) }}">
+            Next →
+        </a>
+
+        {% endif %}
+
+    </div>
+
+</div>
+
+{% endblock %}

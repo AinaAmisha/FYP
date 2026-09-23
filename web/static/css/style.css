@@ -435,3 +435,602 @@ body {
             repeat(2, 1fr);
     }
 }
+
+
+/* ========================================
+   MESSAGE AUDIT LOGS
+======================================== */
+
+.audit-toolbar {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.audit-toolbar input,
+.audit-toolbar select {
+    border: 1px solid #d9e0e6;
+    border-radius: 6px;
+    padding: 10px 12px;
+    background: white;
+}
+
+.audit-toolbar input {
+    flex: 1;
+}
+
+.audit-toolbar button {
+    background: #2878d0;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 10px 20px;
+    cursor: pointer;
+}
+
+.audit-summary {
+    margin-bottom: 15px;
+    color: #667584;
+    font-size: 13px;
+}
+
+.table-wrapper {
+    overflow-x: auto;
+}
+
+.audit-table {
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.audit-table th {
+    text-align: left;
+    font-size: 12px;
+    color: #687786;
+    background: #f6f8fa;
+    padding: 12px;
+    border-bottom: 1px solid #dde3e8;
+}
+
+.audit-table td {
+    padding: 13px 12px;
+    font-size: 13px;
+    border-bottom: 1px solid #edf0f2;
+    vertical-align: middle;
+}
+
+.sender-address {
+    font-weight: 600;
+}
+
+.audit-table small {
+    color: #89949f;
+}
+
+.subject-cell {
+    min-width: 220px;
+}
+
+.result-badge {
+    display: inline-block;
+    padding: 5px 9px;
+    border-radius: 20px;
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.result-ok {
+    background: #e8f1fb;
+    color: #2768a5;
+}
+
+.result-warning {
+    background: #fff3d9;
+    color: #b77400;
+}
+
+.result-danger {
+    background: #fdeaea;
+    color: #bd3333;
+}
+
+.pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 18px;
+    margin-top: 22px;
+}
+
+.pagination a {
+    color: #2878d0;
+    text-decoration: none;
+}
+
+.empty-table {
+    text-align: center;
+    color: #87939e;
+    padding: 35px !important;
+}
+
+/* ========================================
+   MESSAGE DETAILS
+======================================== */
+
+.view-button,
+.back-button {
+    display: inline-block;
+    text-decoration: none;
+
+    background: #eef4fb;
+    color: #2268a9;
+
+    border-radius: 5px;
+
+    padding: 7px 11px;
+
+    font-size: 12px;
+    font-weight: 600;
+}
+
+.view-button:hover,
+.back-button:hover {
+    background: #dfeefa;
+}
+
+
+.detail-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(2, minmax(0, 1fr));
+
+    gap: 20px;
+
+    margin-bottom: 20px;
+}
+
+
+.detail-row {
+    display: flex;
+
+    justify-content: space-between;
+    align-items: flex-start;
+
+    gap: 25px;
+
+    padding: 12px 0;
+
+    border-bottom:
+        1px solid #edf0f2;
+}
+
+
+.detail-row:last-child {
+    border-bottom: none;
+}
+
+
+.detail-row span {
+    color: #71808f;
+
+    font-size: 13px;
+}
+
+
+.detail-row strong {
+    font-size: 13px;
+
+    text-align: right;
+
+    max-width: 65%;
+
+    word-break: break-word;
+}
+
+
+.auth-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, 1fr);
+
+    gap: 10px;
+
+    margin-bottom: 10px;
+}
+
+
+.auth-item {
+    background: #f7f9fa;
+
+    border:
+        1px solid #e5eaee;
+
+    border-radius: 6px;
+
+    padding: 15px;
+}
+
+
+.auth-item span {
+    display: block;
+
+    color: #7c8995;
+
+    font-size: 11px;
+
+    margin-bottom: 7px;
+}
+
+
+.message-body-panel {
+    margin-bottom: 30px;
+}
+
+
+.message-body {
+    white-space: pre-wrap;
+
+    line-height: 1.6;
+
+    background: #f7f9fa;
+
+    border:
+        1px solid #e5eaee;
+
+    border-radius: 6px;
+
+    padding: 20px;
+
+    max-height: 450px;
+
+    overflow-y: auto;
+
+    font-size: 13px;
+}
+
+
+@media (max-width: 900px) {
+
+    .detail-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+/* ========================================
+   FALSE DETECTION
+======================================== */
+
+.false-filter {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.false-filter select {
+    min-width: 200px;
+
+    background: white;
+
+    border: 1px solid #d9e0e6;
+    border-radius: 6px;
+
+    padding: 10px 12px;
+}
+
+.false-filter button {
+    background: #2878d0;
+    color: white;
+
+    border: none;
+    border-radius: 6px;
+
+    padding: 10px 18px;
+
+    cursor: pointer;
+}
+
+.class-badge {
+    display: inline-block;
+
+    padding: 5px 9px;
+
+    border-radius: 20px;
+
+    font-size: 11px;
+    font-weight: 600;
+}
+
+.legitimate-badge {
+    background: #e8f7ee;
+    color: #20814a;
+}
+
+.spam-badge {
+    background: #fdeaea;
+    color: #be3737;
+}
+
+/* ========================================
+   REVIEW CENTER
+======================================== */
+
+.review-alert {
+    background: #fff8e8;
+
+    border:
+        1px solid #f0d99c;
+
+    border-left:
+        4px solid #e8a317;
+
+    border-radius: 7px;
+
+    padding: 17px 20px;
+
+    margin-bottom: 20px;
+}
+
+.review-alert strong {
+    display: block;
+
+    color: #a96d00;
+
+    margin-bottom: 5px;
+}
+
+.review-alert p {
+    color: #70664e;
+
+    font-size: 13px;
+
+    line-height: 1.5;
+}
+
+
+.review-decision-panel {
+    margin-bottom: 30px;
+}
+
+
+.decision-buttons {
+    display: flex;
+
+    gap: 12px;
+}
+
+
+.decision-buttons form {
+    margin: 0;
+}
+
+
+.release-button,
+.keep-button {
+    border: none;
+
+    border-radius: 6px;
+
+    padding: 11px 18px;
+
+    font-weight: 600;
+
+    cursor: pointer;
+}
+
+
+.release-button {
+    background: #248a4b;
+    color: white;
+}
+
+
+.keep-button {
+    background: #c84545;
+    color: white;
+}
+
+
+.release-button:hover {
+    background: #1e773f;
+}
+
+
+.keep-button:hover {
+    background: #ad3939;
+}
+
+
+.legitimate-text {
+    color: #248a4b !important;
+}
+
+/* ========================================
+   MODEL PERFORMANCE
+======================================== */
+
+.selected-model-panel {
+    margin-bottom: 20px;
+}
+
+.selected-model-name {
+    font-size: 27px;
+    font-weight: 700;
+    color: #2268a9;
+}
+
+.selected-badge {
+    display: inline-block;
+
+    margin-left: 7px;
+
+    padding: 4px 8px;
+
+    background: #e8f7ee;
+    color: #20814a;
+
+    border-radius: 15px;
+
+    font-size: 10px;
+    font-weight: 600;
+}
+
+.performance-section {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.model-result-grid {
+    display: grid;
+
+    grid-template-columns:
+        repeat(3, minmax(0, 1fr));
+
+    gap: 15px;
+}
+
+.model-result-card {
+    background: #f7f9fa;
+
+    border: 1px solid #e3e8ec;
+
+    border-radius: 7px;
+
+    padding: 18px;
+}
+
+.model-result-card h4 {
+    margin-bottom: 14px;
+
+    font-size: 16px;
+}
+
+.model-result-row {
+    display: flex;
+
+    justify-content: space-between;
+
+    padding: 9px 0;
+
+    border-bottom:
+        1px solid #e6eaed;
+
+    font-size: 13px;
+}
+
+.model-result-row:last-child {
+    border-bottom: none;
+}
+
+
+@media (max-width: 900px) {
+
+    .model-result-grid {
+        grid-template-columns: 1fr;
+    }
+
+}
+
+
+/* FEATURE IMPORTANCE */
+
+.feature-panel {
+    margin-top: 20px;
+    margin-bottom: 30px;
+}
+
+.feature-row {
+    margin-bottom: 20px;
+}
+
+.feature-label {
+    display: flex;
+    justify-content: space-between;
+    gap: 15px;
+    margin-bottom: 8px;
+    font-size: 13px;
+}
+
+.feature-label strong {
+    color: #2268a9;
+}
+
+.feature-track {
+    width: 100%;
+    height: 13px;
+    background: #e9eef3;
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.feature-fill {
+    height: 100%;
+    background: #2878d0;
+    border-radius: 8px;
+}
+
+
+/* MESSAGE ANALYSIS */
+
+.upload-panel {
+    margin-bottom: 20px;
+}
+
+.upload-panel form {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+    flex-wrap: wrap;
+}
+
+.upload-button {
+    background: #2878d0;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    padding: 11px 20px;
+    font-weight: 600;
+    cursor: pointer;
+}
+
+.upload-error {
+    color: #c93c3c;
+    margin-top: 15px;
+    font-size: 13px;
+}
+
+/* MESSAGE ANALYSIS TABLE */
+
+.table-wrapper {
+    width: 100%;
+    overflow-x: auto;
+}
+
+.audit-table {
+    width: 100%;
+    min-width: 850px;
+}
+
+.main-content {
+    min-width: 0;
+}
+
+
+.download-button {
+    display: inline-block;
+    background: #248a4b;
+    color: white;
+    text-decoration: none;
+    border-radius: 6px;
+    padding: 11px 18px;
+    margin-bottom: 20px;
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.download-button:hover {
+    background: #1e773f;
+}

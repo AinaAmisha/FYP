@@ -1,0 +1,357 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+False Detection | Email Security
+{% endblock %}
+
+
+{% block content %}
+
+<header class="page-header">
+
+    <div>
+
+        <h1>False Detection</h1>
+
+        <p>
+            Investigate email classification errors
+            produced by the machine-learning model.
+        </p>
+
+    </div>
+
+</header>
+
+
+<!-- =====================================
+     SUMMARY CARDS
+===================================== -->
+
+<section class="metric-grid">
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Total False Detections
+        </div>
+
+        <div class="metric-value">
+            {{ "{:,}".format(total_false) }}
+        </div>
+
+        <div class="metric-description">
+            False Positive + False Negative
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card warning-card">
+
+        <div class="metric-label">
+            False Positives
+        </div>
+
+        <div class="metric-value warning-text">
+            {{ "{:,}".format(false_positive) }}
+        </div>
+
+        <div class="metric-description">
+            Legitimate emails predicted as spam
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card danger-card">
+
+        <div class="metric-label">
+            False Negatives
+        </div>
+
+        <div class="metric-value danger-text">
+            {{ "{:,}".format(false_negative) }}
+        </div>
+
+        <div class="metric-description">
+            Spam emails predicted as legitimate
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            False Detection Rate
+        </div>
+
+        <div class="metric-value">
+            {{ "%.2f"|format(false_detection_rate) }}%
+        </div>
+
+        <div class="metric-description">
+            Incorrect classifications in test data
+        </div>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================
+     FALSE DETECTION TABLE
+===================================== -->
+
+<section class="panel">
+
+
+    <div class="panel-header">
+
+        <h3>
+            False Detection Investigation
+        </h3>
+
+        <p>
+            Review incorrectly classified
+            email records.
+        </p>
+
+    </div>
+
+
+
+    <form method="GET"
+          action="{{ url_for('false_detection') }}"
+          class="false-filter">
+
+        <select name="type">
+
+            <option value="All"
+                {% if detection_filter == "All" %}
+                selected
+                {% endif %}>
+                All False Detections
+            </option>
+
+
+            <option value="False Positive"
+                {% if detection_filter == "False Positive" %}
+                selected
+                {% endif %}>
+                False Positive
+            </option>
+
+
+            <option value="False Negative"
+                {% if detection_filter == "False Negative" %}
+                selected
+                {% endif %}>
+                False Negative
+            </option>
+
+        </select>
+
+
+        <button type="submit">
+            Apply Filter
+        </button>
+
+    </form>
+
+
+
+    <div class="table-wrapper">
+
+        <table class="audit-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Sender</th>
+
+                    <th>Subject</th>
+
+                    <th>Actual</th>
+
+                    <th>Prediction</th>
+
+                    <th>Result</th>
+
+                    <th>SPF</th>
+
+                    <th>DKIM</th>
+
+                    <th>DMARC</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+
+                {% for row in messages %}
+
+                <tr>
+
+
+                    <td>
+                        {{ row.source_row_id }}
+                    </td>
+
+
+
+                    <td>
+
+                        <div class="sender-address">
+                            {{ row.from_address }}
+                        </div>
+
+                        <small>
+                            {{ row.from_domain }}
+                        </small>
+
+                    </td>
+
+
+
+                    <td class="subject-cell">
+                        {{ row.subject }}
+                    </td>
+
+
+
+                    <td>
+
+                        <span class="class-badge
+                            {% if row.actual_class == 'spam' %}
+                            spam-badge
+                            {% else %}
+                            legitimate-badge
+                            {% endif %}
+                        ">
+
+                            {{ row.actual_class }}
+
+                        </span>
+
+                    </td>
+
+
+
+                    <td>
+
+                        <span class="class-badge
+                            {% if row.predicted_class == 'spam' %}
+                            spam-badge
+                            {% else %}
+                            legitimate-badge
+                            {% endif %}
+                        ">
+
+                            {{ row.predicted_class }}
+
+                        </span>
+
+                    </td>
+
+
+
+                    <td>
+
+                        {% if row.result_type == "False Positive" %}
+
+                            <span class="result-badge result-warning">
+                                False Positive
+                            </span>
+
+                        {% else %}
+
+                            <span class="result-badge result-danger">
+                                False Negative
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+
+                    <td>
+                        {{ row.spf_result }}
+                    </td>
+
+
+                    <td>
+                        {{ row.dkim_result }}
+                    </td>
+
+
+                    <td>
+                        {{ row.dmarc_result }}
+                    </td>
+
+
+
+                    <td>
+
+                        <a class="view-button"
+                           href="{{ url_for(
+                               'message_detail',
+                               source_row_id=row.source_row_id
+                           ) }}">
+
+                            View
+
+                        </a>
+
+                    </td>
+
+
+                </tr>
+
+
+                {% endfor %}
+
+
+
+                {% if not messages %}
+
+                <tr>
+
+                    <td colspan="10"
+                        class="empty-table">
+
+                        No false detections found.
+
+                    </td>
+
+                </tr>
+
+                {% endif %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+{% endblock %}

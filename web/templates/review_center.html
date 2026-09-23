@@ -1,0 +1,212 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Review Center | Email Security
+{% endblock %}
+
+
+{% block content %}
+
+<header class="page-header">
+
+    <div>
+        <h1>Review Center</h1>
+
+        <p>
+            Review potential false-positive
+            email classifications before
+            making a final decision.
+        </p>
+    </div>
+
+</header>
+
+
+<section class="metric-grid">
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Review Candidates
+        </div>
+
+        <div class="metric-value">
+            {{ total_candidates }}
+        </div>
+
+        <div class="metric-description">
+            Potential false-positive records
+        </div>
+
+    </div>
+
+
+    <div class="metric-card warning-card">
+
+        <div class="metric-label">
+            Pending Review
+        </div>
+
+        <div class="metric-value warning-text">
+            {{ pending_count }}
+        </div>
+
+        <div class="metric-description">
+            Awaiting administrator decision
+        </div>
+
+    </div>
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Reviewed
+        </div>
+
+        <div class="metric-value">
+            {{ reviewed_count }}
+        </div>
+
+        <div class="metric-description">
+            Decisions already recorded
+        </div>
+
+    </div>
+
+
+</section>
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <h3>Pending Review Queue</h3>
+
+        <p>
+            Inspect available security evidence
+            before deciding whether the message
+            should be released or remain spam.
+        </p>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table class="audit-table">
+
+            <thead>
+
+                <tr>
+                    <th>ID</th>
+                    <th>Sender</th>
+                    <th>Subject</th>
+                    <th>ML Prediction</th>
+                    <th>SPF</th>
+                    <th>DKIM</th>
+                    <th>DMARC</th>
+                    <th>Action</th>
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for row in messages %}
+
+                <tr>
+
+                    <td>
+                        {{ row.source_row_id }}
+                    </td>
+
+
+                    <td>
+
+                        <div class="sender-address">
+                            {{ row.from_address }}
+                        </div>
+
+                        <small>
+                            {{ row.from_domain }}
+                        </small>
+
+                    </td>
+
+
+                    <td class="subject-cell">
+                        {{ row.subject }}
+                    </td>
+
+
+                    <td>
+
+                        <span class="class-badge spam-badge">
+                            {{ row.predicted_class }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+                        {{ row.spf_result }}
+                    </td>
+
+
+                    <td>
+                        {{ row.dkim_result }}
+                    </td>
+
+
+                    <td>
+                        {{ row.dmarc_result }}
+                    </td>
+
+
+                    <td>
+
+                        <a class="view-button"
+                           href="{{ url_for(
+                               'review_message',
+                               source_row_id=row.source_row_id
+                           ) }}">
+                            Review
+                        </a>
+
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+
+                {% if not messages %}
+
+                <tr>
+
+                    <td colspan="8"
+                        class="empty-table">
+
+                        No messages are waiting for review.
+
+                    </td>
+
+                </tr>
+
+                {% endif %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+{% endblock %}

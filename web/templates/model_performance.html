@@ -1,0 +1,532 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Model Performance | Email Security
+{% endblock %}
+
+
+{% block content %}
+
+<header class="page-header">
+
+    <div>
+
+        <h1>Model Performance</h1>
+
+        <p>
+            Compare the classification performance
+            of SVM, Naive Bayes and Random Forest.
+        </p>
+
+    </div>
+
+</header>
+
+
+{% if selected_model %}
+
+
+<!-- =====================================
+     SELECTED MODEL
+===================================== -->
+
+<section class="panel selected-model-panel">
+
+    <div class="panel-header">
+
+        <h3>Selected Model</h3>
+
+        <p>
+            Model with the highest F1 Score
+            from the current evaluation.
+        </p>
+
+    </div>
+
+
+    <div class="selected-model-name">
+
+        {{ selected_model["Model"] }}
+
+    </div>
+
+</section>
+
+
+
+<!-- =====================================
+     SELECTED MODEL METRICS
+===================================== -->
+
+<section class="metric-grid">
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Accuracy
+        </div>
+
+        <div class="metric-value">
+            {{ "%.2f"|format(
+                selected_model["Accuracy"]
+            ) }}%
+        </div>
+
+        <div class="metric-description">
+            Overall correct classifications
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Precision
+        </div>
+
+        <div class="metric-value">
+            {{ "%.2f"|format(
+                selected_model["Precision"]
+            ) }}%
+        </div>
+
+        <div class="metric-description">
+            Reliability of spam predictions
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Recall
+        </div>
+
+        <div class="metric-value">
+            {{ "%.2f"|format(
+                selected_model["Recall"]
+            ) }}%
+        </div>
+
+        <div class="metric-description">
+            Spam successfully detected
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            F1 Score
+        </div>
+
+        <div class="metric-value">
+            {{ "%.2f"|format(
+                selected_model["F1 Score"]
+            ) }}%
+        </div>
+
+        <div class="metric-description">
+            Precision-recall balance
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card warning-card">
+
+        <div class="metric-label">
+            False Positive Rate
+        </div>
+
+        <div class="metric-value warning-text">
+            {{ "%.2f"|format(
+                selected_model["False Positive Rate"]
+            ) }}%
+        </div>
+
+        <div class="metric-description">
+            Legitimate emails predicted as spam
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card danger-card">
+
+        <div class="metric-label">
+            False Negative Rate
+        </div>
+
+        <div class="metric-value danger-text">
+            {{ "%.2f"|format(
+                selected_model["False Negative Rate"]
+            ) }}%
+        </div>
+
+        <div class="metric-description">
+            Spam emails predicted as legitimate
+        </div>
+
+    </div>
+
+
+</section>
+
+
+
+<!-- =====================================
+     MODEL COMPARISON
+===================================== -->
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <h3>Model Comparison</h3>
+
+        <p>
+            Evaluation results produced from
+            the same testing dataset.
+        </p>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table class="audit-table model-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>Model</th>
+
+                    <th>Accuracy</th>
+
+                    <th>Precision</th>
+
+                    <th>Recall</th>
+
+                    <th>F1 Score</th>
+
+                    <th>FPR</th>
+
+                    <th>FNR</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for model in models %}
+
+                <tr>
+
+                    <td>
+
+                        <strong>
+                            {{ model["Model"] }}
+                        </strong>
+
+                        {% if loop.first %}
+
+                            <span class="selected-badge">
+                                Selected
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+                        {{ "%.2f"|format(
+                            model["Accuracy"]
+                        ) }}%
+                    </td>
+
+
+                    <td>
+                        {{ "%.2f"|format(
+                            model["Precision"]
+                        ) }}%
+                    </td>
+
+
+                    <td>
+                        {{ "%.2f"|format(
+                            model["Recall"]
+                        ) }}%
+                    </td>
+
+
+                    <td>
+                        <strong>
+                            {{ "%.2f"|format(
+                                model["F1 Score"]
+                            ) }}%
+                        </strong>
+                    </td>
+
+
+                    <td class="warning-text">
+                        {{ "%.2f"|format(
+                            model["False Positive Rate"]
+                        ) }}%
+                    </td>
+
+
+                    <td class="danger-text">
+                        {{ "%.2f"|format(
+                            model["False Negative Rate"]
+                        ) }}%
+                    </td>
+
+                </tr>
+
+                {% endfor %}
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+<section class="panel feature-panel">
+
+    <div class="panel-header">
+        <h3>Random Forest Feature Importance</h3>
+        <p>
+            Relative contribution of each feature
+            to the Random Forest model.
+        </p>
+    </div>
+
+    {% if feature_importance %}
+
+        {% for feature in feature_importance %}
+
+        <div class="feature-row">
+
+            <div class="feature-label">
+                <span>{{ feature["Feature"] }}</span>
+
+                <strong>
+                    {{ "%.2f"|format(
+                        feature["Percentage"]
+                    ) }}%
+                </strong>
+            </div>
+
+            <div class="feature-track">
+
+                <div class="feature-fill"
+                     style="width: {{ feature['Bar Width'] }}%;">
+                </div>
+
+            </div>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>Feature importance results are unavailable.</p>
+
+    {% endif %}
+
+</section>
+
+<!-- =====================================
+     CONFUSION MATRIX COUNTS
+===================================== -->
+
+<section class="panel performance-section">
+
+    <div class="panel-header">
+
+        <h3>Classification Error Comparison</h3>
+
+        <p>
+            Confusion matrix values for
+            each machine-learning model.
+        </p>
+
+    </div>
+
+
+    <div class="model-result-grid">
+
+        {% for model in models %}
+
+        <div class="model-result-card">
+
+            <h4>
+                {{ model["Model"] }}
+            </h4>
+
+
+            <div class="model-result-row">
+
+                <span>True Negative</span>
+
+                <strong>
+                    {{ "{:,}".format(
+                        model["True Negative"]
+                    ) }}
+                </strong>
+
+            </div>
+
+
+            <div class="model-result-row">
+
+                <span>True Positive</span>
+
+                <strong>
+                    {{ "{:,}".format(
+                        model["True Positive"]
+                    ) }}
+                </strong>
+
+            </div>
+
+
+            <div class="model-result-row">
+
+                <span>False Positive</span>
+
+                <strong class="warning-text">
+                    {{ "{:,}".format(
+                        model["False Positive"]
+                    ) }}
+                </strong>
+
+            </div>
+
+
+            <div class="model-result-row">
+
+                <span>False Negative</span>
+
+                <strong class="danger-text">
+                    {{ "{:,}".format(
+                        model["False Negative"]
+                    ) }}
+                </strong>
+
+            </div>
+
+
+        </div>
+
+        {% endfor %}
+
+    </div>
+
+</section>
+
+
+
+<!-- PERMUTATION IMPORTANCE -->
+
+<section class="panel permutation-panel">
+
+    <div class="panel-header">
+
+        <h3>Permutation Feature Importance</h3>
+
+        <p>
+            Average decrease in Random Forest's
+            F1 score after shuffling each feature.
+        </p>
+
+    </div>
+
+    {% if permutation_importance %}
+
+        {% for feature in permutation_importance %}
+
+        <div class="feature-row">
+
+            <div class="feature-label">
+
+                <span>
+                    {{ feature["Feature"] }}
+                </span>
+
+                <strong>
+                    {{ "%.2f"|format(
+                        feature["F1 Drop"]
+                    ) }} pp
+                </strong>
+
+            </div>
+
+            <div class="feature-track">
+
+                <div class="permutation-fill"
+                     style="width: {{ feature['Bar Width'] }}%;">
+                </div>
+
+            </div>
+
+            <small class="permutation-note">
+                Standard deviation:
+                {{ "%.3f"|format(
+                    feature["Std Dev"]
+                ) }} pp
+            </small>
+
+        </div>
+
+        {% endfor %}
+
+    {% else %}
+
+        <p>
+            Permutation importance results
+            are unavailable.
+        </p>
+
+    {% endif %}
+
+</section>
+
+
+{% else %}
+
+
+<section class="panel">
+
+    <div class="empty-table">
+
+        Model evaluation results are unavailable.
+
+    </div>
+
+</section>
+
+
+{% endif %}
+
+
+{% endblock %}

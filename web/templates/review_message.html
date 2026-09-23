@@ -1,0 +1,336 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Review Message | Email Security
+{% endblock %}
+
+
+{% block content %}
+
+
+<header class="page-header">
+
+    <div>
+
+        <h1>Review Message</h1>
+
+        <p>
+            Secondary verification before
+            the final email decision.
+        </p>
+
+    </div>
+
+
+    <a class="back-button"
+       href="{{ url_for('review_center') }}">
+        ← Back to Review Center
+    </a>
+
+</header>
+
+
+
+<div class="review-alert">
+
+    <strong>Potential False Positive</strong>
+
+    <p>
+        The machine-learning model classified
+        this message as spam. Review the
+        available security indicators before
+        making the final decision.
+    </p>
+
+</div>
+
+
+
+<div class="detail-grid">
+
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h3>Email Information</h3>
+        </div>
+
+
+        <div class="detail-row">
+
+            <span>Sender</span>
+
+            <strong>
+                {{ message.get(
+                    'from_address',
+                    'N/A'
+                ) }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <span>Sender Domain</span>
+
+            <strong>
+                {{ message.get(
+                    'from_domain',
+                    'N/A'
+                ) }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <span>Subject</span>
+
+            <strong>
+                {{ message.get(
+                    'subject',
+                    'No Subject'
+                ) }}
+            </strong>
+
+        </div>
+
+    </section>
+
+
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h3>ML Classification</h3>
+        </div>
+
+
+        <div class="detail-row">
+
+            <span>ML Prediction</span>
+
+            <strong>
+                {{ message.get(
+                    'predicted_class',
+                    'N/A'
+                ) }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <span>Authentication Failures</span>
+
+            <strong>
+                {{ message.get(
+                    'auth_fail_count',
+                    0
+                ) }}
+            </strong>
+
+        </div>
+
+    </section>
+
+
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h3>Email Authentication</h3>
+        </div>
+
+
+        <div class="auth-grid">
+
+            <div class="auth-item">
+
+                <span>SPF</span>
+
+                <strong>
+                    {{ message.get(
+                        'spf_result',
+                        'N/A'
+                    ) }}
+                </strong>
+
+            </div>
+
+
+            <div class="auth-item">
+
+                <span>DKIM</span>
+
+                <strong>
+                    {{ message.get(
+                        'dkim_result',
+                        'N/A'
+                    ) }}
+                </strong>
+
+            </div>
+
+
+            <div class="auth-item">
+
+                <span>DMARC</span>
+
+                <strong>
+                    {{ message.get(
+                        'dmarc_result',
+                        'N/A'
+                    ) }}
+                </strong>
+
+            </div>
+
+        </div>
+
+    </section>
+
+
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h3>Security Indicators</h3>
+        </div>
+
+
+        <div class="detail-row">
+
+            <span>URLs</span>
+
+            <strong>
+                {{ message.get(
+                    'num_urls',
+                    0
+                ) }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <span>Attachments</span>
+
+            <strong>
+                {{ message.get(
+                    'attachment_types',
+                    'None'
+                ) or 'None' }}
+            </strong>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <span>Dangerous Attachment</span>
+
+            <strong>
+                {{ message.get(
+                    'dangerous_attachment',
+                    'N/A'
+                ) }}
+            </strong>
+
+        </div>
+
+    </section>
+
+
+</div>
+
+
+
+<section class="panel message-body-panel">
+
+    <div class="panel-header">
+        <h3>Email Content</h3>
+    </div>
+
+    <div class="message-body">
+
+        {{ message.get(
+            'body_plain',
+            'Email body unavailable.'
+        ) }}
+
+    </div>
+
+</section>
+
+
+
+<section class="panel review-decision-panel">
+
+    <div class="panel-header">
+
+        <h3>Final Review Decision</h3>
+
+        <p>
+            Select the action to apply
+            after reviewing the evidence.
+        </p>
+
+    </div>
+
+
+    <div class="decision-buttons">
+
+
+        <form method="POST"
+              action="{{ url_for(
+                  'review_decision',
+                  source_row_id=message.source_row_id
+              ) }}">
+
+            <input type="hidden"
+                   name="decision"
+                   value="release">
+
+            <button type="submit"
+                    class="release-button">
+
+                Release as Legitimate
+
+            </button>
+
+        </form>
+
+
+
+        <form method="POST"
+              action="{{ url_for(
+                  'review_decision',
+                  source_row_id=message.source_row_id
+              ) }}">
+
+            <input type="hidden"
+                   name="decision"
+                   value="keep">
+
+            <button type="submit"
+                    class="keep-button">
+
+                Keep as Spam
+
+            </button>
+
+        </form>
+
+
+    </div>
+
+</section>
+
+
+{% endblock %}

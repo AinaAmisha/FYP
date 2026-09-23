@@ -1,0 +1,278 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Quarantine | Email Security
+{% endblock %}
+
+
+{% block content %}
+
+<header class="page-header">
+
+    <div>
+
+        <h1>Quarantine</h1>
+
+        <p>
+            Messages held for review or retained
+            after the administrator's decision.
+        </p>
+
+    </div>
+
+</header>
+
+
+<section class="metric-grid">
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Review Candidates
+        </div>
+
+        <div class="metric-value">
+            {{ total_candidates }}
+        </div>
+
+        <div class="metric-description">
+            Potential false-positive records
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card warning-card">
+
+        <div class="metric-label">
+            Active Quarantine
+        </div>
+
+        <div class="metric-value warning-text">
+            {{ quarantined_count }}
+        </div>
+
+        <div class="metric-description">
+            Messages currently being held
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Pending Review
+        </div>
+
+        <div class="metric-value">
+            {{ pending_count }}
+        </div>
+
+        <div class="metric-description">
+            No final administrator decision
+        </div>
+
+    </div>
+
+
+
+    <div class="metric-card">
+
+        <div class="metric-label">
+            Released
+        </div>
+
+        <div class="metric-value legitimate-text">
+            {{ released_count }}
+        </div>
+
+        <div class="metric-description">
+            Released as legitimate
+        </div>
+
+    </div>
+
+
+</section>
+
+
+
+<section class="panel">
+
+    <div class="panel-header">
+
+        <h3>Active Quarantine</h3>
+
+        <p>
+            Messages remain here until they are
+            released as legitimate.
+        </p>
+
+    </div>
+
+
+    <div class="table-wrapper">
+
+        <table class="audit-table">
+
+            <thead>
+
+                <tr>
+
+                    <th>ID</th>
+
+                    <th>Sender</th>
+
+                    <th>Subject</th>
+
+                    <th>ML Prediction</th>
+
+                    <th>Status</th>
+
+                    <th>Reviewed At</th>
+
+                    <th>Action</th>
+
+                </tr>
+
+            </thead>
+
+
+            <tbody>
+
+                {% for row in messages %}
+
+                <tr>
+
+
+                    <td>
+                        {{ row.source_row_id }}
+                    </td>
+
+
+                    <td>
+
+                        <div class="sender-address">
+                            {{ row.from_address }}
+                        </div>
+
+                        <small>
+                            {{ row.from_domain }}
+                        </small>
+
+                    </td>
+
+
+                    <td class="subject-cell">
+                        {{ row.subject }}
+                    </td>
+
+
+                    <td>
+
+                        <span class="class-badge spam-badge">
+                            {{ row.predicted_class }}
+                        </span>
+
+                    </td>
+
+
+                    <td>
+
+                        {% if row.decision == "Pending Review" %}
+
+                            <span class="result-badge result-warning">
+                                Pending Review
+                            </span>
+
+                        {% else %}
+
+                            <span class="result-badge result-danger">
+                                Keep as Spam
+                            </span>
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if row.reviewed_at %}
+
+                            {{ row.reviewed_at }}
+
+                        {% else %}
+
+                            -
+
+                        {% endif %}
+
+                    </td>
+
+
+                    <td>
+
+                        {% if row.decision == "Pending Review" %}
+
+                            <a class="view-button"
+                               href="{{ url_for(
+                                   'review_message',
+                                   source_row_id=row.source_row_id
+                               ) }}">
+                                Review
+                            </a>
+
+                        {% else %}
+
+                            <a class="view-button"
+                               href="{{ url_for(
+                                   'message_detail',
+                                   source_row_id=row.source_row_id
+                               ) }}">
+                                View
+                            </a>
+
+                        {% endif %}
+
+                    </td>
+
+
+                </tr>
+
+                {% endfor %}
+
+
+
+                {% if not messages %}
+
+                <tr>
+
+                    <td colspan="7"
+                        class="empty-table">
+
+                        No messages currently
+                        remain in quarantine.
+
+                    </td>
+
+                </tr>
+
+                {% endif %}
+
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+</section>
+
+
+{% endblock %}

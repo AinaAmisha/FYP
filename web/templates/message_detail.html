@@ -1,0 +1,263 @@
+{% extends "base.html" %}
+
+
+{% block title %}
+Message Details | Email Security
+{% endblock %}
+
+
+{% block content %}
+
+<header class="page-header">
+
+    <div>
+
+        <h1>Message Details</h1>
+
+        <p>
+            Email classification and security analysis.
+        </p>
+
+    </div>
+
+
+    <a class="back-button"
+       href="{{ url_for('audit_logs') }}">
+        ← Back to Audit Logs
+    </a>
+
+</header>
+
+
+<div class="detail-grid">
+
+
+    <!-- EMAIL INFORMATION -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h3>Email Information</h3>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Source ID</span>
+
+            <strong>
+                {{ message.get('source_row_id', 'N/A') }}
+            </strong>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Sender</span>
+
+            <strong>
+                {{ message.get('from_address', 'N/A') }}
+            </strong>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Sender Domain</span>
+
+            <strong>
+                {{ message.get('from_domain', 'N/A') }}
+            </strong>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Subject</span>
+
+            <strong>
+                {{ message.get('subject', 'No Subject') }}
+            </strong>
+        </div>
+
+    </section>
+
+
+
+    <!-- CLASSIFICATION -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h3>Classification</h3>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Actual Classification</span>
+
+            <strong>
+                {{ message.get('actual_class', 'N/A') }}
+            </strong>
+        </div>
+
+
+        <div class="detail-row">
+            <span>ML Prediction</span>
+
+            <strong>
+                {{ message.get('predicted_class', 'N/A') }}
+            </strong>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Detection Result</span>
+
+            <strong>
+                {{ message.get('result_type', 'N/A') }}
+            </strong>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Original Label</span>
+
+            <strong>
+                {{ message.get('label', 'N/A') }}
+            </strong>
+        </div>
+
+    </section>
+
+
+
+    <!-- AUTHENTICATION -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h3>Email Authentication</h3>
+        </div>
+
+
+        <div class="auth-grid">
+
+            <div class="auth-item">
+                <span>SPF</span>
+
+                <strong>
+                    {{ message.get('spf_result', 'N/A') }}
+                </strong>
+            </div>
+
+
+            <div class="auth-item">
+                <span>DKIM</span>
+
+                <strong>
+                    {{ message.get('dkim_result', 'N/A') }}
+                </strong>
+            </div>
+
+
+            <div class="auth-item">
+                <span>DMARC</span>
+
+                <strong>
+                    {{ message.get('dmarc_result', 'N/A') }}
+                </strong>
+            </div>
+
+        </div>
+
+
+        <div class="detail-row">
+
+            <span>Authentication Failure Count</span>
+
+            <strong>
+                {{ message.get('auth_fail_count', 0) }}
+            </strong>
+
+        </div>
+
+    </section>
+
+
+
+    <!-- SECURITY INDICATORS -->
+
+    <section class="panel">
+
+        <div class="panel-header">
+            <h3>Security Indicators</h3>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Number of URLs</span>
+
+            <strong>
+                {{ message.get('num_urls', 0) }}
+            </strong>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Attachments</span>
+
+            <strong>
+                {{ message.get('attachment_types', 'None') or 'None' }}
+            </strong>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Has Attachment</span>
+
+            <strong>
+                {{ message.get('has_attachments', 'N/A') }}
+            </strong>
+        </div>
+
+
+        <div class="detail-row">
+            <span>Dangerous Attachment</span>
+
+            <strong>
+                {{ message.get('dangerous_attachment', 'N/A') }}
+            </strong>
+        </div>
+
+    </section>
+
+
+</div>
+
+
+
+<!-- EMAIL BODY -->
+
+<section class="panel message-body-panel">
+
+    <div class="panel-header">
+
+        <h3>Email Body</h3>
+
+        <p>
+            Original message content used for inspection.
+        </p>
+
+    </div>
+
+
+    <div class="message-body">
+
+        {{ message.get(
+            'body_plain',
+            'Email body unavailable.'
+        ) }}
+
+    </div>
+
+</section>
+
+
+{% endblock %}
