@@ -37,6 +37,7 @@ app = Flask(
 
 PROJECT_ROOT = Path(__file__).resolve().parent
 RESULT_FOLDER = PROJECT_ROOT / "results"
+EXPORT_FOLDER = RESULT_FOLDER / "exports"
 
 MODEL_RESULTS_FILE = (
     RESULT_FOLDER / "model_results.csv"
@@ -271,8 +272,6 @@ def save_review_decision(
         REVIEW_FILE,
         index=False
     )
-
-    EXPORT_FOLDER = RESULT_FOLDER / "exports"
 
 
 # ==========================================
