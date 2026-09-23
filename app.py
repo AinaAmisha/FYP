@@ -1,5 +1,6 @@
-from flask import send_file
-from uuid import uuid4
+from flask import send_file, session
+from uuid import uuid4, UUID
+import secrets
 
 from flask import (
     Flask,
@@ -38,6 +39,26 @@ app = Flask(
 PROJECT_ROOT = Path(__file__).resolve().parent
 RESULT_FOLDER = PROJECT_ROOT / "results"
 EXPORT_FOLDER = RESULT_FOLDER / "exports"
+
+
+# ==========================================
+# PERSISTENT FLASK SESSION
+# ==========================================
+
+RESULT_FOLDER.mkdir(parents=True, exist_ok=True)
+
+SECRET_FILE = RESULT_FOLDER / ".flask_secret_key"
+
+if not SECRET_FILE.exists():
+    SECRET_FILE.write_text(
+        secrets.token_hex(32),
+        encoding="utf-8"
+    )
+
+app.secret_key = SECRET_FILE.read_text(
+    encoding="utf-8"
+).strip()
+
 
 MODEL_RESULTS_FILE = (
     RESULT_FOLDER / "model_results.csv"
@@ -1258,6 +1279,9 @@ def message_analysis():
                     index=False
                 )
 
+                # Remember this classification for future visits
+                session["last_export_id"] = export_id.hex
+
                 total = len(df)
 
                 legitimate_count = int(
@@ -1289,6 +1313,67 @@ def message_analysis():
                 pd.errors.ParserError
             ) as exc:
                 error = str(exc)
+
+
+
+
+    # ==========================================
+    # RESTORE PREVIOUS CLASSIFICATION RESULTS
+    # ==========================================
+
+    if total == 0 and session.get("last_export_id"):
+
+        try:
+            saved_id = UUID(session["last_export_id"])
+
+            saved_path = (
+                EXPORT_FOLDER / f"{saved_id.hex}.csv"
+            )
+
+            if saved_path.is_file():
+
+                saved_df = pd.read_csv(
+                    saved_path,
+                    low_memory=False
+                )
+
+                total = len(saved_df)
+
+                legitimate_count = int(
+                    saved_df["predicted_class"]
+                    .eq("legitimate")
+                    .sum()
+                )
+
+                spam_count = int(
+                    saved_df["predicted_class"]
+                    .eq("spam")
+                    .sum()
+                )
+
+                if "from_address" not in saved_df.columns:
+                    saved_df["from_address"] = "-"
+
+                if "subject" not in saved_df.columns:
+                    saved_df["subject"] = "-"
+
+                messages = (
+                    saved_df.head(25)
+                    .fillna("")
+                    .to_dict(orient="records")
+                )
+
+                export_id = saved_id
+
+        except (
+            ValueError,
+            OSError,
+            pd.errors.ParserError
+        ):
+            session.pop("last_export_id", None)
+
+
+
 
     return render_template(
             "message_analysis.html",

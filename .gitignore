@@ -24,3 +24,9 @@ models/
 
 # Misc
 .DS_Store
+
+#Flask session secret key
+results/.flask_secret_key
+
+#Generated classification results
+results/exports/
