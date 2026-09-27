@@ -424,6 +424,12 @@ def audit_logs():
 
     total = len(df)
 
+    review_required_count = int(
+        df["verification_status"]
+        .eq("Review Required")
+        .sum()
+    )
+
     pages = max(
         (total + per_page - 1)
         // per_page,
@@ -1174,6 +1180,7 @@ def message_analysis():
     total = 0
     legitimate_count = 0
     spam_count = 0
+    review_required_count = 0
     error = None
     export_id = None
 
@@ -1244,6 +1251,126 @@ def message_analysis():
                     probabilities.max(axis=1) * 100
                 )
 
+
+                                # ======================================
+                # SECONDARY VERIFICATION
+                # ======================================
+
+                # Use baseline verdict from uploaded CSV
+                # when available.
+                if "baseline_verdict" in df.columns:
+
+                    df["baseline_verdict"] = (
+                        df["baseline_verdict"]
+                        .astype("string")
+                        .str.strip()
+                        .str.lower()
+                    )
+
+                    valid = df["baseline_verdict"].isin(
+                        ["legitimate", "spam"]
+                    )
+
+                    if not valid.all():
+                        raise ValueError(
+                            "baseline_verdict must contain "
+                            "only legitimate or spam."
+                        )
+
+                    df["baseline_source"] = "uploaded_filter"
+
+                else:
+
+                    # Temporary simulated baseline filter.
+                    # This will later be replaced by the
+                    # actual email-filter verdict.
+                    df["baseline_verdict"] = "legitimate"
+
+                    suspicious = (
+                        (X["auth_fail_count"] >= 2)
+                        &
+                        (X["dmarc_pass"] == 0)
+                    )
+
+                    df.loc[
+                        suspicious,
+                        "baseline_verdict"
+                    ] = "spam"
+
+                    df["baseline_source"] = "simulated_rules"
+
+                # Compare baseline verdict with ML prediction.
+                disagreement = (
+                    df["baseline_verdict"]
+                    != df["predicted_class"]
+                )
+
+                df["verification_status"] = "Matched"
+
+                df.loc[
+                    disagreement,
+                    "verification_status"
+                ] = "Review Required"
+
+
+                
+                # ======================================
+                # SECONDARY VERIFICATION
+                # ======================================
+
+                # Use the original filter verdict if
+                # the uploaded CSV provides one.
+                if "baseline_verdict" in df.columns:
+
+                    df["baseline_verdict"] = (
+                        df["baseline_verdict"]
+                        .astype("string")
+                        .str.strip()
+                        .str.lower()
+                    )
+
+                    valid = df["baseline_verdict"].isin(
+                        ["legitimate", "spam"]
+                    )
+
+                    if not valid.all():
+                        raise ValueError(
+                            "baseline_verdict must contain "
+                            "only legitimate or spam."
+                        )
+
+                    df["baseline_source"] = "uploaded_filter"
+
+                else:
+                    # Simulated filter for prototype testing.
+                    # This is NOT a real email gateway verdict.
+                    df["baseline_verdict"] = "legitimate"
+
+                    suspicious = (
+                        (X["auth_fail_count"] >= 2)
+                        &
+                        (X["dmarc_pass"] == 0)
+                    )
+
+                    df.loc[
+                        suspicious,
+                        "baseline_verdict"
+                    ] = "spam"
+
+                    df["baseline_source"] = "simulated_rules"
+
+                # Compare the baseline and ML verdicts.
+                disagreement = (
+                    df["baseline_verdict"]
+                    != df["predicted_class"]
+                )
+
+                df["verification_status"] = "Matched"
+
+                df.loc[
+                    disagreement,
+                    "verification_status"
+                ] = "Review Required"
                 
                 # ======================================
                 # EXPORT CLASSIFICATION RESULTS
@@ -1261,9 +1388,12 @@ def message_analysis():
                     for column in [
                         "from_address",
                         "subject",
+                        "baseline_verdict",
+                        "baseline_source",
                         "predicted_class",
                         "prediction_confidence",
-                        "spam_probability"
+                        "spam_probability",
+                        "verification_status"
                     ]
                     if column in df.columns
                 ]
@@ -1339,6 +1469,12 @@ def message_analysis():
 
                 total = len(saved_df)
 
+                review_required_count = int(
+                    saved_df["verification_status"]
+                    .eq("Review Required")
+                    .sum()
+                ) if "verification_status" in saved_df.columns else 0
+
                 legitimate_count = int(
                     saved_df["predicted_class"]
                     .eq("legitimate")
@@ -1376,13 +1512,14 @@ def message_analysis():
 
 
     return render_template(
-            "message_analysis.html",
-            messages=messages,
-            total=total,
-            legitimate_count=legitimate_count,
-            spam_count=spam_count,
-            error=error,
-            export_id=export_id
+        "message_analysis.html",
+        messages=messages,
+        total=total,
+        legitimate_count=legitimate_count,
+        spam_count=spam_count,
+        review_required_count=review_required_count,
+        error=error,
+        export_id=export_id
     )
 
 
